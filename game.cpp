@@ -1,5 +1,6 @@
 #include "game.h"
 
+
 Game::Game() {
 
 }
@@ -19,20 +20,32 @@ void Game::Init(const char* title, int xpos, int ypos, int width, int height, bo
 
 		window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
 		if (window) {
-			std::cout << "window created" << std::endl;
-			
-			renderer = SDL_CreateRenderer(window, -1, 0);
-			if (renderer) {
-
-				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-				std::cout << "renderer created" << std::endl;
-			}
+			std::cout << "window created" << std::endl;	
 		}
+		else {
+			CancelLoad();
+			return;
+		}
+
+		renderer = SDL_CreateRenderer(window, -1, 0);
+		if (renderer) {
+
+			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+			std::cout << "renderer created" << std::endl;
+		}
+		else {
+			CancelLoad();
+			return;
+		}
+
 		isRunning = true;
 	}
 	else {
-		isRunning = false;
+		CancelLoad();
 	}
+}
+void Game::CancelLoad() {
+	isRunning = false;
 }
 void Game::HandleEvents() 
 {

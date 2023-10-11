@@ -25,6 +25,9 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="assetInclude\Texture\jag.png" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -78,7 +81,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\gvb7m\Documents\DevLibC\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\gvb7m\Documents\DevLibC\SDL2_image-2.6.3;C:\Users\gvb7m\Documents\DevLibC\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\gvb7m\Documents\DevLibC\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

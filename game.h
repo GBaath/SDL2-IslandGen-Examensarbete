@@ -4,6 +4,7 @@
 #include "SDL.h"
 #include <stdio.h>
 #include <iostream>
+#include "SDL_image.h"
 class Game
 {
 public:
@@ -15,21 +16,26 @@ public:
 	void Render();
 	void Clean();
 
+
 	bool GameRunning() { return isRunning; }
 
+
 private:
+	void CancelLoad();
+
+
 	struct FrameData {
-		int framecnt;
+		int framecnt = 0;
 		const int targetFPS = 60;
 		const Uint32 frameDelay = 1000 / targetFPS; 
-		Uint32 frameStart;
-		Uint32 frameTime;
+		Uint32 frameStart = 0;
+		Uint32 frameTime = 0;
 	};
 	FrameData fdata;
 
-	bool isRunning;
-	SDL_Window* window;
-	SDL_Renderer* renderer;
+	bool isRunning = false;
+	SDL_Window* window = nullptr;
+	SDL_Renderer* renderer = nullptr;
 
 };
 
