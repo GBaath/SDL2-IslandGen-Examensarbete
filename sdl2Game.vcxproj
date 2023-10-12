@@ -20,13 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
+    <ClInclude Include="Tile.h" />
+    <ClInclude Include="Tilemap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Tiling.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assetInclude\Texture\jag.png" />
+    <Image Include="assets\Texture\Tiles.bmp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

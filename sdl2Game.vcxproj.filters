@@ -18,6 +18,12 @@
     <ClInclude Include="game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Tilemap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp">
@@ -26,9 +32,12 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Tiling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assetInclude\Texture\jag.png">
+    <Image Include="assets\Texture\Tiles.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

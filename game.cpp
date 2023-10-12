@@ -1,4 +1,6 @@
 #include "game.h"
+#include "tilemap.h"
+#include <stdlib.h>
 
 
 Game::Game() {
@@ -38,6 +40,9 @@ void Game::Init(const char* title, int xpos, int ypos, int width, int height, bo
 			return;
 		}
 
+		tilemap = new Tilemap();
+		tilemap->Init(renderer);
+
 		isRunning = true;
 	}
 	else {
@@ -56,7 +61,12 @@ void Game::HandleEvents()
 		case SDL_QUIT:
 			isRunning = false;
 			break;
-
+			
+		case SDL_KEYDOWN: {
+			if(event.key.keysym.sym == SDLK_SPACE)
+				tilemap->MakeIsland();
+			break;
+		}
 		default:
 			break;
 	}
@@ -78,11 +88,15 @@ void Game::Update()
 void Game::Render() 
 {
 	SDL_RenderClear(renderer);
+	
 	//stuff
+	tilemap->RenderTiles(renderer);
+
 	SDL_RenderPresent(renderer);
 }
 void Game::Clean() 
 {
+	tilemap->Clean();
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
