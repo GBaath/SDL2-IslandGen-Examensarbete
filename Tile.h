@@ -10,12 +10,17 @@ public:
 	
 	void Init(int size,int xpos, int ypos);
 	void SetTileType(TileType type) { tileType = type; }
+	bool HasAsNeighbor(Tile* tile) {
+		for (Tile* tile : neighborTiles) {
+			if (tile == tile)
+				return true;
+		}
+		return false;
+	}
 	TileType GetTileType() { return tileType; }
 
-	Tile* aboveTile = nullptr;
-	Tile* belowTile = nullptr;
-	Tile* rightTile = nullptr;
-	Tile* leftTile = nullptr;
+	Tile* neighborTiles[4]{nullptr,nullptr,nullptr,nullptr};
+
 
 	SDL_Rect tileRect;
 private:

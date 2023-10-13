@@ -1,5 +1,7 @@
 #include "Tilemap.h"
 #include <iostream>
+#include <vector>
+#include <random>
 
 Tilemap::Tilemap() {
 	tileWidth = WIDTH / TILESIZE;
@@ -77,39 +79,64 @@ void Tilemap::MakeIsland() {
 	tilemap[tileWidth / 2][tileHeight / 2]->SetTileType(Tile::TileType::forest);
 
 	//dont generate on edges
-	for (int x = 1; x < (tileWidth-1); x++) {
-		for (int y = 1; y < (tileHeight-1); y++) {
-			
-			Tile* tile = tilemap[x][y];
+	std::vector <Tile*> avaliabeSpawnTiles;
+	while (groundSize < maxGroundSize) {
+
+		bool dobreak = false; 
+		for (int x = 1; x < (tileWidth-1); x++) {
+			//break both loops on break
+			if (dobreak)
+				break;
+			for (int y = 1; y < (tileHeight-1); y++) {
 
 
-			tile->aboveTile = tilemap[x][y+1];
-			tile->belowTile = tilemap[x][y-1];
-			tile->rightTile = tilemap[x+1][y];
-			tile->leftTile = tilemap[x-1][y];
+				Tile* tile = tilemap[x][y];
 
-			if ((tile->GetTileType()==Tile::TileType::forest) && groundSize<maxGroundSize) {
-				if (tile->aboveTile->GetTileType() == Tile::TileType::water) {
-					tile->aboveTile->SetTileType(Tile::TileType::forest);
+
+				tile->neighborTiles[0] = tilemap[x][y+1];
+				tile->neighborTiles[1] = tilemap[x+1][y];
+				tile->neighborTiles[2] = tilemap[x][y-1];
+				tile->neighborTiles[3] = tilemap[x-1][y];
+
+				//add avaliable neighbors of landtiles to vector
+				if (tile->GetTileType() == Tile::forest){
+					for (Tile* tile : tile->neighborTiles) {
+						if (tile->GetTileType() == Tile::water)
+							avaliabeSpawnTiles.push_back(tile);
+					}
 				}
-				if (tile->belowTile->GetTileType() == Tile::TileType::water) {
-					tile->aboveTile->SetTileType(Tile::TileType::forest);
-				}
-				if (tile->rightTile->GetTileType() == Tile::TileType::water) {
-					tile->aboveTile->SetTileType(Tile::TileType::forest);
-				}
-				if (tile->leftTile->GetTileType() == Tile::TileType::water) {
-					tile->aboveTile->SetTileType(Tile::TileType::forest);
-				}
+
 			}
-			groundSize++;
 		}
+		//new random tile
+		std::random_device rd; // Use a random device to seed the generator
+		std::mt19937 gen(rd()); // Create a Mersenne Twister random number generator
+		std::shuffle(avaliabeSpawnTiles.begin(), avaliabeSpawnTiles.end(), gen); // Define a distribution for indices
+		avaliabeSpawnTiles[0]->SetTileType(Tile::forest);
+		groundSize++;
+
+		avaliabeSpawnTiles.clear();
 	}
+		
 	//ground spawn next to more ground, add chance if more tiles
 	//keep going until maxtiles
 	//make some edges into sand
 	//spawn some blobs of forest
 
+}
+void Tilemap::ClearIsland() {
+	for (int x = 0; x < (tileWidth); x++) {
+		for (int y = 0; y < (tileHeight); y++) {
+			tilemap[x][y]->SetTileType(Tile::water);
+			groundSize = 0;
+		}
+	}
+}
+bool CheckTileAvaliable(Tile* tile) {
+	if (tile->GetTileType() == Tile::water)
+		return true;
+	else
+		return false;
 }
 void Tilemap::Clean() {
 	SDL_DestroyTexture(tilemapTexture);

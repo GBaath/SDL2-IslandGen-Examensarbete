@@ -14,6 +14,7 @@ public:
 	void Init(SDL_Renderer* renderer);
 	void RenderTiles(SDL_Renderer* renderer);
 	void MakeIsland();
+	void ClearIsland();
 	void Clean();
 
 	const static int WIDTH = 800;
@@ -24,7 +25,7 @@ public:
 private:
 	int tileWidth, tileHeight = 0;
 	int groundSize = 0;
-	int maxGroundSize = 20;
+	int maxGroundSize = 140;
 
 	SDL_Surface* tilemapSurface = nullptr;
 	SDL_Texture* tilemapTexture = nullptr;

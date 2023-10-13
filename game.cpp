@@ -65,6 +65,8 @@ void Game::HandleEvents()
 		case SDL_KEYDOWN: {
 			if(event.key.keysym.sym == SDLK_SPACE)
 				tilemap->MakeIsland();
+			if (event.key.keysym.sym == SDLK_DELETE)
+				tilemap->ClearIsland();
 			break;
 		}
 		default:
