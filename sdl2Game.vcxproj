@@ -29,6 +29,7 @@
     <ClCompile Include="Tiling.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\Downloads\watertiles.bmp" />
     <Image Include="assets\Texture\Tiles.bmp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

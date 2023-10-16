@@ -40,5 +40,8 @@
     <Image Include="assets\Texture\Tiles.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\Downloads\watertiles.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
