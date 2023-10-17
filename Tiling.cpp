@@ -7,9 +7,8 @@ Tilemap::Tilemap() {
 	tileWidth = WIDTH / TILESIZE;
 	tileHeight = HEIGHT / TILESIZE;
 }
-Tilemap::~Tilemap() {
+Tilemap::~Tilemap() {}
 
-}
 void Tilemap::Init(SDL_Renderer* renderer) {
 	tilemapSurface = SDL_LoadBMP("assets/Texture/watertiles.bmp");
 	if (!tilemapSurface) {
@@ -26,10 +25,22 @@ void Tilemap::Init(SDL_Renderer* renderer) {
 	for (int x = 0; x < (tileWidth); x++) {
 		for (int y = 0; y < (tileHeight); y++) {
 			tilemap[x][y] = new Tile();
-			tilemap[x][y]->Init(TILESIZE,x*TILESIZE,y*TILESIZE);
+			tilemap[x][y]->Init(TILESIZE,x*TILESIZE,y*TILESIZE);		
 		}
 	}
-
+	//tile neighbors
+	for (int x = 1; x < (tileWidth-1); x++) {
+		for (int y = 1; y < (tileHeight-1); y++) {
+			//top
+			tilemap[x][y]->neighborTiles[0] = tilemap[x][y + 1];
+			//right
+			tilemap[x][y]->neighborTiles[1] = tilemap[x + 1][y];
+			//bottom
+			tilemap[x][y]->neighborTiles[2] = tilemap[x][y - 1];
+			//left
+			tilemap[x][y]->neighborTiles[3] = tilemap[x - 1][y];
+		}
+	}
 	//read sourceimage and set values
 	for (int x = 0; x < SOURCETILESX; x++) {
 		for (int y = 0; y < SOURCETILESY; y++) {
@@ -39,10 +50,8 @@ void Tilemap::Init(SDL_Renderer* renderer) {
 			sourceTiles[x][y].y = y * TILESIZE;
 		}
 	}
-
 }
 void Tilemap::RenderTiles(SDL_Renderer* renderer) {
-
 	for (int x = 0; x < (tileWidth); x++) {
 		for (int y = 0; y < (tileHeight); y++) {
 			Tilemap::GetTileMapCordsOfTileType(outx, outy, tilemap[x][y]->GetTileType());
@@ -51,31 +60,19 @@ void Tilemap::RenderTiles(SDL_Renderer* renderer) {
 	}
 }
 void Tilemap::MakeIsland() {
-
 	tilemap[tileWidth / 2][tileHeight / 2]->SetTileType(Tile::TileType::forest_full);
-
-	//dont generate on edges
 	std::vector <Tile*> avaliabeSpawnTiles;
-	while (groundSize < maxGroundSize) {
 
+	while (groundSize < maxGroundSize) {
 		bool dobreak = false; 
-		for (int x = 2; x < (tileWidth-2); x++) {
+
+		//dont generate on edges
+		for (int x = 3; x < (tileWidth-3); x++) {
 			//break both loops on break
 			if (dobreak)
 				break;
-			for (int y = 2; y < (tileHeight-2); y++) {
-
-
+			for (int y = 3; y < (tileHeight-3); y++) {
 				Tile* tile = tilemap[x][y];
-
-				//top
-				tile->neighborTiles[0] = tilemap[x][y+1];
-				//right
-				tile->neighborTiles[1] = tilemap[x+1][y];
-				//bottom
-				tile->neighborTiles[2] = tilemap[x][y-1];
-				//left
-				tile->neighborTiles[3] = tilemap[x-1][y];
 
 				//add avaliable neighbors of landtiles to vector
 				if (tile->GetTileType() == Tile::forest_full){
@@ -84,32 +81,28 @@ void Tilemap::MakeIsland() {
 							avaliabeSpawnTiles.push_back(tile);
 					}
 				}
-
 			}
 		}
 		//new random tile
 		std::random_device rd; // Use a random device to seed the generator
 		std::mt19937 gen(rd()); // Create a Mersenne Twister random number generator
 		std::shuffle(avaliabeSpawnTiles.begin(), avaliabeSpawnTiles.end(), gen);
+
+		//set new random first element of vector to be the new landtile
 		avaliabeSpawnTiles[0]->SetTileType(Tile::forest_full);
 		groundSize++;
-
-		avaliabeSpawnTiles.clear();
+		avaliabeSpawnTiles.clear(); //clean vector for next iteration
 	}
 
 	//ruletiling
 	for (int x = 0; x < (tileWidth); x++) {
 		for (int y = 0; y < (tileHeight); y++) {
-			std::cout << y << x << std::endl;
 			tilemap[x][y]->SetTileTypeFromNeighbors();
 		}
 	}
 		
-	//ground spawn next to more ground, add chance if more tiles
-	//keep going until maxtiles
 	//make some edges into sand
 	//spawn some blobs of forest
-
 }
 void Tilemap::ClearIsland() {
 	for (int x = 0; x < (tileWidth); x++) {
@@ -128,12 +121,8 @@ bool CheckTileAvaliable(Tile* tile) {
 void Tilemap::Clean() {
 	SDL_DestroyTexture(tilemapTexture);
 }
-Tile::Tile() {
-
-}
-Tile::~Tile() {
-
-}
+Tile::Tile() {}
+Tile::~Tile() {}
 void Tile::Init(int size, int xpos, int ypos) {
 	tileRect.w = size;
 	tileRect.h = size;
@@ -143,6 +132,6 @@ void Tile::Init(int size, int xpos, int ypos) {
 	//indexes i array
 	arrX = xpos / size;
 	arrY = ypos / size;
-
+	//default is water
 	tileType = TileType::water_full;
 }

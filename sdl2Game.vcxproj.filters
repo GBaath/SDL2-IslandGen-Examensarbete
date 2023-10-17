@@ -40,7 +40,10 @@
     <Image Include="assets\Texture\Tiles.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="..\..\..\Downloads\watertiles.bmp">
+    <Image Include="assets\Texture\watertiles.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\Texture\cursor.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

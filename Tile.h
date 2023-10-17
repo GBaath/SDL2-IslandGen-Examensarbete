@@ -1,11 +1,12 @@
 #pragma once
 #ifndef tile_h
 #define tile_h
+#include <iostream>
 class Tile {
 public:
 	enum TileType {water_full,forest_full, 
 		toprightLand, topLand,topleftLand,
-		leftLand,rightLand,
+		leftLand,rightLand, leftrightLand, topbottomLand,
 		bottomleftLand,bottomLand,bottomrightLand,
 		topWater,bottomWater,
 		rightWater,leftWater,
@@ -16,14 +17,6 @@ public:
 	
 	void Init(int size,int xpos, int ypos);
 	void SetTileType(TileType type) { tileType = type; }
-	bool HasAsNeighbor(Tile* tile) {
-		for (Tile* tile : neighborTiles) {
-			if (tile == tile)
-				return true;
-		}
-		return false;
-	}
-	TileType GetTileType() { return tileType; }
 	void SetTileTypeFromNeighbors() {
 
 
@@ -31,7 +24,7 @@ public:
 			return;
 		bool top= false, right= false, bot = false, left = false;
 
-		if(neighborTiles[0] != nullptr)
+		if (neighborTiles[0] != nullptr) 
 			top = neighborTiles[0]->GetTileType() == forest_full;
 		if (neighborTiles[1] != nullptr)
 			right = neighborTiles[1]->GetTileType() == forest_full;
@@ -40,6 +33,7 @@ public:
 		if (neighborTiles[3] != nullptr)
 			left = neighborTiles[3]->GetTileType() == forest_full;
 
+		
 
 		//4
 		if (!top && !right && !bot && !left) {
@@ -65,9 +59,9 @@ public:
 		else if (top && right && !bot && !left) {
 			SetTileType(bottomrightLand);
 		}
-		/*else if (top && !right && bot && !left) { //no sprite
-			SetTileType(topLand);
-		}*/
+		else if (top && !right && bot && !left) {
+			SetTileType(topbottomLand);
+		}
 		else if (top && !right && !bot && left) {
 			SetTileType(bottomleftLand);
 		}
@@ -80,9 +74,9 @@ public:
 		else if (!top && !right && bot && left) {
 			SetTileType(topleftLand);
 		}
-		/*else if (!top && right && !bot && left) { //no sprite
-			SetTileType(topleftLand);
-		}*/
+		else if (!top && right && !bot && left) {
+			SetTileType(leftrightLand);
+		}
 		//1
 		else if (top && right && bot && !left) {
 			SetTileType(leftWater);
@@ -100,13 +94,21 @@ public:
 
 	}
 
+	bool HasAsNeighbor(Tile* tile) {
+		for (Tile* tile : neighborTiles) {
+			if (tile == tile)
+				return true;
+		}
+		return false;
+	}
+
+	TileType GetTileType() { return tileType; }
 	Tile* neighborTiles[4]{nullptr,nullptr,nullptr,nullptr};
-
-
 	SDL_Rect tileRect;
+
 private:
-	TileType tileType;
 	int arrX, arrY;
 
+	TileType tileType;
 };
 #endif "tile.h"

@@ -29,8 +29,9 @@
     <ClCompile Include="Tiling.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Downloads\watertiles.bmp" />
+    <Image Include="assets\Texture\cursor.bmp" />
     <Image Include="assets\Texture\Tiles.bmp" />
+    <Image Include="assets\Texture\watertiles.bmp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

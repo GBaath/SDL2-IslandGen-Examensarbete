@@ -17,9 +17,6 @@ public:
 	void MakeIsland();
 	void ClearIsland();
 	void Clean();
-	/*SDL_Rect GetTileTypeRect(Tile::TileType tileType) {
-		return sourcemap[tileType];
-	}*/
 	void GetTileMapCordsOfTileType(int* x, int* y,Tile::TileType type) {
 		switch (type)
 		{
@@ -83,6 +80,14 @@ public:
 			*x = 5;
 			*y = 2;
 			break;
+		case Tile::leftrightLand:
+			*x = 1;
+			*y = 3;
+			break;
+		case Tile::topbottomLand:
+			*x = 2;
+			*y = 3;
+			break;
 		default:
 			break;
 		}
@@ -99,10 +104,13 @@ private:
 	int groundSize = 0;
 	int maxGroundSize = 140;
 
+	//used for holding references to render tiles
 	int holderx = 0;
 	int holdery = 0;
 	int* outx = &holderx;
 	int* outy = &holdery;
+
+
 	//used for coordinate management of source image
 	const static int SOURCETILESX = 9,
 		SOURCETILESY = 4;
@@ -110,8 +118,10 @@ private:
 	SDL_Surface* tilemapSurface = nullptr;
 	SDL_Texture* tilemapTexture = nullptr;
 
+	//the actual tilemap
 	SDL_Rect tile[WIDTH / TILESIZE][HEIGHT / TILESIZE];
 
+	//sourceimage
 	SDL_Rect sourceTiles[SOURCETILESX][SOURCETILESY];
 };
 #endif "tilemap_h"
