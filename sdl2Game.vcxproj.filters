@@ -24,6 +24,9 @@
     <ClInclude Include="Tile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Calculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp">
@@ -37,7 +40,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\Texture\Tiles.bmp">
+    <Image Include="assets\Texture\decortiles.bmp">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\Texture\watertiles.bmp">

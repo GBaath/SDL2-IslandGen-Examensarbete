@@ -2,21 +2,28 @@
 #ifndef tile_h
 #define tile_h
 #include <iostream>
+#include <vector>
 class Tile {
 public:
-	enum TileType {water_full,forest_full, 
+	enum TileType {empty, water_full,land_full, 
 		toprightLand, topLand,topleftLand,
 		leftLand,rightLand, leftrightLand, topbottomLand,
 		bottomleftLand,bottomLand,bottomrightLand,
 		topWater,bottomWater,
 		rightWater,leftWater,
-		pond};
+		pond, forest_pine, forest_birch
+	};
+	enum DecorType {
+		none, pine, birch
+	};
+
 
 	Tile();
 	~Tile();
 	
 	void Init(int size,int xpos, int ypos);
 	void SetTileType(TileType type) { tileType = type; }
+	void SetDecorType(DecorType type) { decorType = type; }
 	void SetTileTypeFromNeighbors() {
 
 
@@ -25,13 +32,13 @@ public:
 		bool top= false, right= false, bot = false, left = false;
 
 		if (neighborTiles[0] != nullptr) 
-			top = neighborTiles[0]->GetTileType() == forest_full;
+			top = neighborTiles[0]->GetTileType() == land_full;
 		if (neighborTiles[1] != nullptr)
-			right = neighborTiles[1]->GetTileType() == forest_full;
+			right = neighborTiles[1]->GetTileType() == land_full;
 		if (neighborTiles[2] != nullptr)
-			bot = neighborTiles[2]->GetTileType() == forest_full;
+			bot = neighborTiles[2]->GetTileType() == land_full;
 		if (neighborTiles[3] != nullptr)
-			left = neighborTiles[3]->GetTileType() == forest_full;
+			left = neighborTiles[3]->GetTileType() == land_full;
 
 		
 
@@ -93,6 +100,7 @@ public:
 		
 
 	}
+	void SpawnTrees();
 
 	bool HasAsNeighbor(Tile* tile) {
 		for (Tile* tile : neighborTiles) {
@@ -101,14 +109,22 @@ public:
 		}
 		return false;
 	}
+	int GetTreeDensity() { return treeDensity; }
+	void SetTreeDensity(int density) { treeDensity = density; }
+	
 
 	TileType GetTileType() { return tileType; }
+	DecorType GetDecorType() { return  decorType; }
 	Tile* neighborTiles[4]{nullptr,nullptr,nullptr,nullptr};
+	Tile* overlayTile = nullptr;
 	SDL_Rect tileRect;
 
+	std::vector <SDL_Rect> treeHolder;
 private:
 	int arrX, arrY;
+	int treeDensity = 0;
 
 	TileType tileType;
+	DecorType decorType;
 };
 #endif "tile.h"

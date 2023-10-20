@@ -4,6 +4,8 @@
 #include "SDL.h"
 #include "tile.h"
 #include <map>
+#include <vector>
+#include "Calculator.h"
 
 
 
@@ -15,6 +17,7 @@ public:
 	void Init(SDL_Renderer* renderer);
 	void RenderTiles(SDL_Renderer* renderer);
 	void MakeIsland();
+	void SpawnForests(int startCount, int maxTileCount);
 	void ClearIsland();
 	void Clean();
 	void GetTileMapCordsOfTileType(int* x, int* y,Tile::TileType type) {
@@ -24,7 +27,7 @@ public:
 			*x = 1;
 			*y = 1;
 			break;
-		case Tile::forest_full:
+		case Tile::land_full:
 			*x = 0;
 			*y = 3;
 			break;
@@ -88,16 +91,61 @@ public:
 			*x = 2;
 			*y = 3;
 			break;
+		case Tile::forest_pine:
+			*x = 3;
+			*y = 3;
+			break;
+		case Tile::forest_birch:
+			*x = 4;
+			*y = 3;
+			break;
+		case Tile::empty:
+			break;
 		default:
 			break;
 		}
 
 	}
+	void GetDecorMapCordsOfTileType(int* x, int* y, Tile::DecorType type) {
+		switch (type)
+		{
+		case Tile::empty:
+			break;
+		case Tile::pine:
+
+			if (Calculator::GetRandomIndex(0, 1) > 0) {
+				*x = 0;
+				*y = 0;
+			}
+			else
+			{
+				*x = 0;
+				*y = 0;
+			}
+			break;
+
+		case Tile::birch:
+			if (Calculator::GetRandomIndex(0, 1) > 0) {
+				*x = 2;
+				*y = 0;
+			}
+			else
+			{
+				*x = 2;
+				*y = 0;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
 
 	const static int WIDTH = 800;
 	const static int HEIGHT = 640;
 	const static int TILESIZE = 32;
 	Tile* tilemap[WIDTH / TILESIZE][HEIGHT / TILESIZE];
+	std::vector <Tile*> landTiles;
 
 private:
 	int tileWidth, tileHeight = 0;
@@ -114,14 +162,19 @@ private:
 	//used for coordinate management of source image
 	const static int SOURCETILESX = 9,
 		SOURCETILESY = 4;
+	const static int DECORSOURCETILESX = 4, DECORSOURCETILESY = 4;
 
 	SDL_Surface* tilemapSurface = nullptr;
 	SDL_Texture* tilemapTexture = nullptr;
+
+	SDL_Surface* decormapSurface = nullptr;
+	SDL_Texture* decormapTexture = nullptr;
 
 	//the actual tilemap
 	SDL_Rect tile[WIDTH / TILESIZE][HEIGHT / TILESIZE];
 
 	//sourceimage
 	SDL_Rect sourceTiles[SOURCETILESX][SOURCETILESY];
+	SDL_Rect sourceTilesDecor[DECORSOURCETILESX][DECORSOURCETILESY];
 };
 #endif "tilemap_h"

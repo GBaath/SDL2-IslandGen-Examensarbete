@@ -21,7 +21,6 @@ public:
 
 	bool GameRunning() { return isRunning; }
 
-
 private:
 	void CancelLoad();
 
