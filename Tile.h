@@ -3,6 +3,12 @@
 #define tile_h
 #include <iostream>
 #include <vector>
+#include "Tilemap.h"
+#include "Decor.h";
+
+
+
+
 class Tile {
 public:
 	enum TileType {empty, water_full,land_full, 
@@ -21,7 +27,7 @@ public:
 	Tile();
 	~Tile();
 	
-	void Init(int size,int xpos, int ypos);
+	void Init(int size, int xpos, int ypos);
 	void SetTileType(TileType type) { tileType = type; }
 	void SetDecorType(DecorType type) { decorType = type; }
 	void SetTileTypeFromNeighbors() {
@@ -100,7 +106,7 @@ public:
 		
 
 	}
-	void SpawnTrees();
+	void SpawnTrees(int density,DecorType type);
 
 	bool HasAsNeighbor(Tile* tile) {
 		for (Tile* tile : neighborTiles) {
@@ -110,16 +116,15 @@ public:
 		return false;
 	}
 	int GetTreeDensity() { return treeDensity; }
-	void SetTreeDensity(int density) { treeDensity = density; }
 	
 
 	TileType GetTileType() { return tileType; }
-	DecorType GetDecorType() { return  decorType; }
+	DecorType GetDecorType() { return  decorType; } 
 	Tile* neighborTiles[4]{nullptr,nullptr,nullptr,nullptr};
 	Tile* overlayTile = nullptr;
+	Tile* spawnedFrom = nullptr;
 	SDL_Rect tileRect;
-
-	std::vector <SDL_Rect> treeHolder;
+	std::vector <Tree> treeHolder;
 private:
 	int arrX, arrY;
 	int treeDensity = 0;

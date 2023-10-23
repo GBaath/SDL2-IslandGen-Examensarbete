@@ -35,6 +35,10 @@ void Tilemap::Init(SDL_Renderer* renderer) {
 		std::cout << "notex" << std::endl;;
 	}
 
+	mountainSurface = SDL_LoadBMP("assets/Texture/mountain.bmp");
+	mountainTexture = SDL_CreateTextureFromSurface(renderer, mountainSurface);
+	SDL_FreeSurface(mountainSurface);
+
 	//set coords and sizes
 	for (int x = 0; x < (tileWidth); x++) {
 		for (int y = 0; y < (tileHeight); y++) {
@@ -83,21 +87,22 @@ void Tilemap::RenderTiles(SDL_Renderer* renderer) {
 		}
 	}
 	for (int x = 0; x < (tileWidth); x++) {
-		for (int y = 0; y < (tileHeight); y++) {
+		for (int y = tileHeight-1; y >= 0; y--) {
 		
 			//overlay
 			if (tilemap[x][y]->overlayTile->GetTileType()!=Tile::empty) {
 
 				for (size_t i = 0; i < tilemap[x][y]->overlayTile->treeHolder.size(); i++)
 				{
-					Tilemap::GetDecorMapCordsOfTileType(outx, outy, tilemap[x][y]->overlayTile->GetDecorType());
-					SDL_RenderCopy(renderer, decormapTexture, &sourceTilesDecor[*outx][*outy], &tilemap[x][y]->overlayTile->treeHolder[i]);
+					Tree *tree = &tilemap[x][y]->overlayTile->treeHolder[i];
+					
+					SDL_SetTextureColorMod(decormapTexture, tree->colorShade, tree->colorShade, tree->colorShade);
+					SDL_RenderCopy(renderer, decormapTexture, &sourceTilesDecor[tree->textureMapCordsX][tree->textureMapCordsY], &tree->rect);
 				}
 			}
 		
 		}
 	}
-
 }
 void Tilemap::MakeIsland() {
 	tilemap[tileWidth / 2][tileHeight / 2]->SetTileType(Tile::TileType::land_full);
@@ -112,13 +117,15 @@ void Tilemap::MakeIsland() {
 			if (dobreak)
 				break;
 			for (int y = 3; y < (tileHeight-3); y++) {
-				Tile* tile = tilemap[x][y];
+				Tile* sourcetile = tilemap[x][y];
 
 				//add avaliable neighbors of landtiles to vector
-				if (tile->GetTileType() == Tile::land_full){
-					for (Tile* tile : tile->neighborTiles) {
-						if (tile->GetTileType() == Tile::water_full)
+				if (sourcetile->GetTileType() == Tile::land_full){
+					for (Tile* tile : sourcetile->neighborTiles) {
+						if (tile->GetTileType() == Tile::water_full) {
 							avaliabeSpawnTiles.push_back(tile);
+							tile->spawnedFrom = sourcetile;
+						}
 					}
 				}
 			}
@@ -144,7 +151,7 @@ void Tilemap::MakeIsland() {
 		
 	//make some edges into sand
 	//spawn some blobs of forest
-	SpawnForests(15, 50);
+	SpawnForests(10, 40);
 }
 void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 	size_t my_size = landTiles.size();
@@ -190,9 +197,7 @@ void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 		if (!availableSpawnTilesPine.empty()) {
 			int random = Calculator::GetRandomIndex(0, availableSpawnTilesPine.size() - 1);
 			availableSpawnTilesPine[random]->overlayTile->SetTileType(Tile::forest_pine);
-			availableSpawnTilesPine[random]->overlayTile->SetDecorType(Tile::pine);
-			availableSpawnTilesPine[random]->overlayTile->SetTreeDensity(5);
-			availableSpawnTilesPine[random]->overlayTile->SpawnTrees();
+			availableSpawnTilesPine[random]->overlayTile->SpawnTrees(5,Tile::pine);
 			forestTiles.push_back(availableSpawnTilesPine[random]);
 			currentCount++;
 		}
@@ -204,9 +209,7 @@ void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 		if (!availableSpawnTilesBirch.empty()) {
 			int random = Calculator::GetRandomIndex(0, availableSpawnTilesBirch.size() - 1);
 			availableSpawnTilesBirch[random]->overlayTile->SetTileType(Tile::forest_birch);
-			availableSpawnTilesBirch[random]->overlayTile->SetDecorType(Tile::birch);
-			availableSpawnTilesBirch[random]->overlayTile->SetTreeDensity(5);
-			availableSpawnTilesBirch[random]->overlayTile->SpawnTrees();
+			availableSpawnTilesBirch[random]->overlayTile->SpawnTrees(5,Tile::birch);
 			forestTiles.push_back(availableSpawnTilesBirch[random]);
 			currentCount++;
 		}
@@ -237,7 +240,9 @@ void Tilemap::Clean() {
 }
 Tile::Tile() {}
 Tile::~Tile() {}
+
 void Tile::Init(int size, int xpos, int ypos) {
+
 	tileRect.w = size;
 	tileRect.h = size;
 	tileRect.x = xpos;
@@ -254,21 +259,30 @@ void Tile::Init(int size, int xpos, int ypos) {
 	overlayTile->tileRect.h = size;
 	overlayTile->tileRect.x = xpos;
 	overlayTile->tileRect.y = ypos;
+
 }
-void Tile::SpawnTrees() {
+void Tile::SpawnTrees(int density,DecorType type) {
+
+	SetDecorType(type);
+	treeDensity = density;
 	treeHolder.clear();
 	treeHolder.resize(treeDensity);
 	int x = 0, y = 0;
 	for (size_t i = 0; i < treeDensity; i++)
 	{
 		//random tilecords
-		x = Calculator::GetRandomIndex(0, Tilemap::TILESIZE);
-		y = Calculator::GetRandomIndex(0, Tilemap::TILESIZE);
+		x = Calculator::GetRandomIndex(-Tilemap::TILESIZE/2, Tilemap::TILESIZE/2);
+		y = Calculator::GetRandomIndex(-Tilemap::TILESIZE/2, Tilemap::TILESIZE/2);
 
-		treeHolder[i].w = 16;
-		treeHolder[i].h = 16;
-		treeHolder[i].x = x+tileRect.x;
-		treeHolder[i].y = y+tileRect.y;
+		treeHolder[i].rect.w = 16;
+		treeHolder[i].rect.h = 16;
+		treeHolder[i].rect.x = x+tileRect.x;
+		treeHolder[i].rect.y = y+tileRect.y;
+		
+
+		treeHolder[i].colorShade = Calculator::GetRandomIndex(200, 255);
+
+		Tilemap::GetDecorMapCordsOfTileType(&treeHolder[i].textureMapCordsX, &treeHolder[i].textureMapCordsY, type);
 	}
 
 }

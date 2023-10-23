@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calculator.h" />
+    <ClInclude Include="Decor.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Tilemap.h" />
@@ -32,6 +33,7 @@
   <ItemGroup>
     <Image Include="assets\Texture\cursor.bmp" />
     <Image Include="assets\Texture\decortiles.bmp" />
+    <Image Include="assets\Texture\mountain.bmp" />
     <Image Include="assets\Texture\watertiles.bmp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

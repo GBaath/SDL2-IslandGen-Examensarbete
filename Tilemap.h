@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include "Calculator.h"
+#include "decor.h"
 
 
 
@@ -20,7 +21,7 @@ public:
 	void SpawnForests(int startCount, int maxTileCount);
 	void ClearIsland();
 	void Clean();
-	void GetTileMapCordsOfTileType(int* x, int* y,Tile::TileType type) {
+	static void GetTileMapCordsOfTileType(int* x, int* y,Tile::TileType type) {
 		switch (type)
 		{
 		case Tile::water_full:
@@ -106,7 +107,7 @@ public:
 		}
 
 	}
-	void GetDecorMapCordsOfTileType(int* x, int* y, Tile::DecorType type) {
+	static void GetDecorMapCordsOfTileType(int* x, int* y, Tile::DecorType type) {
 		switch (type)
 		{
 		case Tile::empty:
@@ -170,11 +171,16 @@ private:
 	SDL_Surface* decormapSurface = nullptr;
 	SDL_Texture* decormapTexture = nullptr;
 
+	SDL_Surface* mountainSurface = nullptr;
+	SDL_Texture* mountainTexture = nullptr;
+
+
 	//the actual tilemap
 	SDL_Rect tile[WIDTH / TILESIZE][HEIGHT / TILESIZE];
 
 	//sourceimage
 	SDL_Rect sourceTiles[SOURCETILESX][SOURCETILESY];
 	SDL_Rect sourceTilesDecor[DECORSOURCETILESX][DECORSOURCETILESY];
+	SDL_Rect mtnRect;
 };
 #endif "tilemap_h"

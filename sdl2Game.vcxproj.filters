@@ -27,6 +27,9 @@
     <ClInclude Include="Calculator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Decor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp">
@@ -47,6 +50,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\Texture\cursor.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\Texture\mountain.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
