@@ -19,6 +19,7 @@ public:
 	void RenderTiles(SDL_Renderer* renderer);
 	void MakeIsland();
 	void SpawnForests(int startCount, int maxTileCount);
+	void SpawnMountains(int count);
 	void ClearIsland();
 	void Clean();
 	static void GetTileMapCordsOfTileType(int* x, int* y,Tile::TileType type) {
@@ -164,6 +165,7 @@ private:
 	const static int SOURCETILESX = 9,
 		SOURCETILESY = 4;
 	const static int DECORSOURCETILESX = 4, DECORSOURCETILESY = 4;
+	const static int MOUNTAINSOURCETILES = 5;
 
 	SDL_Surface* tilemapSurface = nullptr;
 	SDL_Texture* tilemapTexture = nullptr;
@@ -177,10 +179,11 @@ private:
 
 	//the actual tilemap
 	SDL_Rect tile[WIDTH / TILESIZE][HEIGHT / TILESIZE];
+	std::vector <Moutain> mountains;
 
 	//sourceimage
 	SDL_Rect sourceTiles[SOURCETILESX][SOURCETILESY];
 	SDL_Rect sourceTilesDecor[DECORSOURCETILESX][DECORSOURCETILESY];
-	SDL_Rect mtnRect;
+	SDL_Rect sourceTilesMtn[5];
 };
 #endif "tilemap_h"

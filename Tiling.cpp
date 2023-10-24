@@ -3,6 +3,8 @@
 #include <vector>
 #include <random>
 #include "Calculator.h"
+#include <algorithm>
+
 
 Tilemap::Tilemap() {
 	tileWidth = WIDTH / TILESIZE;
@@ -36,7 +38,13 @@ void Tilemap::Init(SDL_Renderer* renderer) {
 	}
 
 	mountainSurface = SDL_LoadBMP("assets/Texture/mountain.bmp");
+	if (!mountainSurface) {
+		std::cerr << "Error loading BMP: " << SDL_GetError() << std::endl;
+	}
 	mountainTexture = SDL_CreateTextureFromSurface(renderer, mountainSurface);
+	if (!mountainTexture) {
+		std::cout << "notex" << std::endl;;
+	}
 	SDL_FreeSurface(mountainSurface);
 
 	//set coords and sizes
@@ -76,6 +84,13 @@ void Tilemap::Init(SDL_Renderer* renderer) {
 			sourceTilesDecor[x][y].y = y * TILESIZE;
 		}
 	}
+	for  (int i = 0; i < MOUNTAINSOURCETILES; i++)
+	{
+		sourceTilesMtn[i].w = TILESIZE;
+		sourceTilesMtn[i].h = TILESIZE * 2;
+		sourceTilesMtn[i].x = i * TILESIZE;
+		sourceTilesMtn[i].y = 0;
+	}
 }
 void Tilemap::RenderTiles(SDL_Renderer* renderer) {
 	for (int x = 0; x < (tileWidth); x++) {
@@ -101,6 +116,13 @@ void Tilemap::RenderTiles(SDL_Renderer* renderer) {
 				}
 			}
 		
+		}
+	}
+	for (size_t j = 0; j < mountains.size(); j++)
+	{
+		for (size_t i = 0; i < mountains[j].mountainRects.size(); i++)
+		{ 
+			SDL_RenderCopy(renderer, mountainTexture, &mountains[j].mountainSource[i], &mountains[j].mountainRects[i]);
 		}
 	}
 }
@@ -149,9 +171,8 @@ void Tilemap::MakeIsland() {
 		}
 	}
 		
-	//make some edges into sand
-	//spawn some blobs of forest
 	SpawnForests(10, 40);
+	SpawnMountains(4);
 }
 void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 	size_t my_size = landTiles.size();
@@ -218,6 +239,27 @@ void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 		availableSpawnTilesPine.clear();
 	}
 }
+void Tilemap::SpawnMountains(int count) {
+	mountains.clear();
+	mountains.resize(Calculator::GetRandomIndex(1, count));
+	for (size_t i = 0; i < mountains.size(); i++)
+	{
+		int posx, posy;
+		int index = Calculator::GetRandomIndex(0, landTiles.size());
+		posx = landTiles[index]->tileRect.x;
+		posy = landTiles[index]->tileRect.y;
+
+		int size = Calculator::GetRandomIndex(0, 7);
+		
+		mountains[i].Init(size, posx,posy);
+		
+	}
+	//sort y layering
+	std::sort(mountains.begin(), mountains.end(), [](const Moutain& a, const Moutain& b) {
+        return a.posY < b.posY;
+    });
+}
+
 
 void Tilemap::ClearIsland() {
 	for (int x = 0; x < (tileWidth); x++) {
@@ -225,6 +267,7 @@ void Tilemap::ClearIsland() {
 			tilemap[x][y]->SetTileType(Tile::water_full);
 			tilemap[x][y]->overlayTile->SetTileType(Tile::TileType::empty);
 			landTiles.clear();
+			mountains.clear();
 			groundSize = 0;
 		}
 	}
@@ -285,4 +328,8 @@ void Tile::SpawnTrees(int density,DecorType type) {
 		Tilemap::GetDecorMapCordsOfTileType(&treeHolder[i].textureMapCordsX, &treeHolder[i].textureMapCordsY, type);
 	}
 
+	//sort the layering
+	std::sort(treeHolder.begin(), treeHolder.end(), [](const Tree& a, const Tree& b) {
+		return a.posY < b.posY;
+		});
 }
