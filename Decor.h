@@ -4,18 +4,25 @@
 #include "SDL.h"
 #include <vector>
 
+class DecorBase {
+public:
+	int posY;
+	Uint8 colorShade;
 
-class Tree {
+	DecorBase() {}
+	~DecorBase() {}
+};
+
+class Tree : public DecorBase{
 public:
 
-	int posY;
 	SDL_Rect rect;
-	Uint8 colorShade;
 
 	int textureMapCordsX, textureMapCordsY;
 };
-class Moutain {
+class Mountain : public DecorBase{
 public:
+	//The sprites are always set based on size, no random
 	void Init(int size, int posX, int posY) {
 		if (size < 2)
 			size = 2;
@@ -70,17 +77,18 @@ public:
 			mountainSource.push_back(rightend);
 		}
 
+		//pos shift to middlepoint is center
+		int offset = (-32 * (size/2));
 		for (size_t i = 0; i < size; i++)
 		{
 			mountainRects[i].h = 64;
 			mountainRects[i].w = 32;
 			mountainRects[i].y = posY;
-			mountainRects[i].x = posX+32*i;
+			mountainRects[i].x = posX+32*i+offset;
 		}
 	}
 
-	int posY;
-	Uint8 colorShade;
+	int sourceListIndex = 0, destListIndex = 0;
 	std::vector<SDL_Rect> mountainSource;
 	std::vector<SDL_Rect> mountainRects;
 

@@ -160,6 +160,7 @@ private:
 	int* outx = &holderx;
 	int* outy = &holdery;
 
+	std::vector<DecorBase*> renderingList;
 
 	//used for coordinate management of source image
 	const static int SOURCETILESX = 9,
@@ -179,7 +180,7 @@ private:
 
 	//the actual tilemap
 	SDL_Rect tile[WIDTH / TILESIZE][HEIGHT / TILESIZE];
-	std::vector <Moutain> mountains;
+	std::vector <Mountain> mountains;
 
 	//sourceimage
 	SDL_Rect sourceTiles[SOURCETILESX][SOURCETILESY];

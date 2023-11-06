@@ -101,30 +101,44 @@ void Tilemap::RenderTiles(SDL_Renderer* renderer) {
 
 		}
 	}
-	for (int x = 0; x < (tileWidth); x++) {
-		for (int y = tileHeight-1; y >= 0; y--) {
-		
-			//overlay
-			if (tilemap[x][y]->overlayTile->GetTileType()!=Tile::empty) {
-
-				for (size_t i = 0; i < tilemap[x][y]->overlayTile->treeHolder.size(); i++)
-				{
-					Tree *tree = &tilemap[x][y]->overlayTile->treeHolder[i];
-					
-					SDL_SetTextureColorMod(decormapTexture, tree->colorShade, tree->colorShade, tree->colorShade);
-					SDL_RenderCopy(renderer, decormapTexture, &sourceTilesDecor[tree->textureMapCordsX][tree->textureMapCordsY], &tree->rect);
-				}
-			}
-		
-		}
-	}
-	for (size_t j = 0; j < mountains.size(); j++)
+	for (DecorBase* element : renderingList)
 	{
-		for (size_t i = 0; i < mountains[j].mountainRects.size(); i++)
-		{ 
+		if (dynamic_cast<Tree*>(element)) {
+			Tree* tree = dynamic_cast<Tree*>(element);
+			SDL_SetTextureColorMod(decormapTexture, tree->colorShade, tree->colorShade, tree->colorShade);
+			SDL_RenderCopy(renderer, decormapTexture, &sourceTilesDecor[tree->textureMapCordsX][tree->textureMapCordsY], &tree->rect);
+		}
+		else if (dynamic_cast<Mountain*>(element)) {
+			Mountain* mountain = dynamic_cast<Mountain*>(element);
+			int j = mountain->sourceListIndex;
+			int i = mountain->destListIndex;
 			SDL_RenderCopy(renderer, mountainTexture, &mountains[j].mountainSource[i], &mountains[j].mountainRects[i]);
 		}
 	}
+	//for (int x = 0; x < (tileWidth); x++) {
+	//	for (int y = tileHeight-1; y >= 0; y--) {
+	//	
+	//		//overlay
+	//		if (tilemap[x][y]->overlayTile->GetTileType()!=Tile::empty) {
+
+	//			for (size_t i = 0; i < tilemap[x][y]->overlayTile->treeHolder.size(); i++)
+	//			{
+	//				Tree *tree = &tilemap[x][y]->overlayTile->treeHolder[i];
+	//				
+	//				SDL_SetTextureColorMod(decormapTexture, tree->colorShade, tree->colorShade, tree->colorShade);
+	//				SDL_RenderCopy(renderer, decormapTexture, &sourceTilesDecor[tree->textureMapCordsX][tree->textureMapCordsY], &tree->rect);
+	//			}
+	//		}
+	//	
+	//	}
+	//}
+	//for (size_t j = 0; j < mountains.size(); j++)
+	//{
+	//	for (size_t i = 0; i < mountains[j].mountainRects.size(); i++)
+	//	{ 
+	//		SDL_RenderCopy(renderer, mountainTexture, &mountains[j].mountainSource[i], &mountains[j].mountainRects[i]);
+	//	}
+	//}
 }
 void Tilemap::MakeIsland() {
 	tilemap[tileWidth / 2][tileHeight / 2]->SetTileType(Tile::TileType::land_full);
@@ -173,6 +187,32 @@ void Tilemap::MakeIsland() {
 		
 	SpawnForests(10, 40);
 	SpawnMountains(4);
+
+
+	//add all trees to renderinglist
+	for (int x = 0; x < (tileWidth); x++) {
+		for (int y = tileHeight - 1; y >= 0; y--) {
+			if (tilemap[x][y]->overlayTile->GetTileType() != Tile::empty) {
+
+				for (size_t i = 0; i < tilemap[x][y]->overlayTile->treeHolder.size(); i++)
+				{
+					Tree* tree = &tilemap[x][y]->overlayTile->treeHolder[i];
+
+					renderingList.push_back(tree);
+				}
+			}
+		}
+	}
+	//add mountain to renderinglist
+	for (size_t j = 0; j < mountains.size(); j++)
+	{
+		for (size_t i = 0; i < mountains[j].mountainRects.size(); i++)
+		{
+			mountains[j].sourceListIndex = j;
+			mountains[j].destListIndex = i;
+			renderingList.push_back(&mountains[j]);
+		}
+	}
 }
 void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 	size_t my_size = landTiles.size();
@@ -241,7 +281,8 @@ void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 }
 void Tilemap::SpawnMountains(int count) {
 	mountains.clear();
-	mountains.resize(Calculator::GetRandomIndex(1, count));
+	int newSize = (Calculator::GetRandomIndex(1, count));
+	mountains.resize(newSize);
 	for (size_t i = 0; i < mountains.size(); i++)
 	{
 		int posx, posy;
@@ -255,7 +296,7 @@ void Tilemap::SpawnMountains(int count) {
 		
 	}
 	//sort y layering
-	std::sort(mountains.begin(), mountains.end(), [](const Moutain& a, const Moutain& b) {
+	std::sort(mountains.begin(), mountains.end(), [](const Mountain& a, const Mountain& b) {
         return a.posY < b.posY;
     });
 }
@@ -266,11 +307,11 @@ void Tilemap::ClearIsland() {
 		for (int y = 0; y < (tileHeight); y++) {
 			tilemap[x][y]->SetTileType(Tile::water_full);
 			tilemap[x][y]->overlayTile->SetTileType(Tile::TileType::empty);
-			landTiles.clear();
-			mountains.clear();
-			groundSize = 0;
 		}
 	}
+	landTiles.clear();
+	mountains.clear();
+	groundSize = 0;
 }
 bool CheckTileAvaliable(Tile* tile) {
 	if (tile->GetTileType() == Tile::water_full)
@@ -332,4 +373,5 @@ void Tile::SpawnTrees(int density,DecorType type) {
 	std::sort(treeHolder.begin(), treeHolder.end(), [](const Tree& a, const Tree& b) {
 		return a.posY < b.posY;
 		});
+
 }
