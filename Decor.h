@@ -6,22 +6,23 @@
 
 class DecorBase {
 public:
-	int posY;
+	//baseclass needs virtual functions
+	virtual int GetPosY() { return yPos; }
 	Uint8 colorShade;
-
-	DecorBase() {}
-	~DecorBase() {}
+	int yPos;
 };
 
 class Tree : public DecorBase{
 public:
 
 	SDL_Rect rect;
-
 	int textureMapCordsX, textureMapCordsY;
+
+
 };
 class Mountain : public DecorBase{
 public:
+
 	//The sprites are always set based on size, no random
 	void Init(int size, int posX, int posY) {
 		if (size < 2)
@@ -93,7 +94,6 @@ public:
 	std::vector<SDL_Rect> mountainRects;
 
 private:
-
 	SDL_Rect leftend, lefttrans, middle, righttrans, rightend;
 };
 #endif "decor.h"
