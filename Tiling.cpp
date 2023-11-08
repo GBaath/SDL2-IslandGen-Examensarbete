@@ -101,45 +101,23 @@ void Tilemap::RenderTiles(SDL_Renderer* renderer) {
 
 		}
 	}
-	//this is broken
-	/*for (DecorBase* element : renderingList)
+	//render decor
+	for (DecorBase* element : renderingList)
 	{
 		if (dynamic_cast<Tree*>(element)) {
 			Tree* tree = dynamic_cast<Tree*>(element);
 			SDL_SetTextureColorMod(decormapTexture, tree->colorShade, tree->colorShade, tree->colorShade);
 			SDL_RenderCopy(renderer, decormapTexture, &sourceTilesDecor[tree->textureMapCordsX][tree->textureMapCordsY], &tree->rect);
-			std::cout << tree->yPos << "tree" << std::endl;
+			//std::cout << tree->yPos << "tree" << std::endl;
 		}
 		else if (dynamic_cast<Mountain*>(element)) {
 			Mountain* mountain = dynamic_cast<Mountain*>(element);
 			int j = mountain->sourceListIndex;
-			int i = mountain->destListIndex;
-			SDL_RenderCopy(renderer, mountainTexture, &mountains[j].mountainSource[i], &mountains[j].mountainRects[i]);
-			std::cout << mountain->yPos<< "mtn" << std::endl;
-		}
-	}*/
-	for (size_t j = 0; j < mountains.size(); j++)
-	{
-		for (size_t i = 0; i < mountains[j].mountainRects.size(); i++)
-		{ 
-			SDL_RenderCopy(renderer, mountainTexture, &mountains[j].mountainSource[i], &mountains[j].mountainRects[i]);
-		}
-	}
-	for (int x = 0; x < (tileWidth); x++) {
-		for (int y = tileHeight-1; y >= 0; y--) {
-		
-			//overlay
-			if (tilemap[x][y]->overlayTile->GetTileType()!=Tile::empty) {
 
-				for (size_t i = 0; i < tilemap[x][y]->overlayTile->treeHolder.size(); i++)
-				{
-					Tree *tree = &tilemap[x][y]->overlayTile->treeHolder[i];
-					
-					SDL_SetTextureColorMod(decormapTexture, tree->colorShade, tree->colorShade, tree->colorShade);
-					SDL_RenderCopy(renderer, decormapTexture, &sourceTilesDecor[tree->textureMapCordsX][tree->textureMapCordsY], &tree->rect);
-				}
+			for (size_t i = 0; i < mountains[j].mountainRects.size(); i++)
+			{ 
+				SDL_RenderCopy(renderer, mountainTexture, &mountains[j].mountainSource[i], &mountains[j].mountainRects[i]);
 			}
-		
 		}
 	}
 }
@@ -192,36 +170,35 @@ void Tilemap::MakeIsland() {
 	SpawnMountains(4);
 
 
-	////add all trees to renderinglist
-	//for (int x = 0; x < (tileWidth); x++) {
-	//	for (int y = tileHeight - 1; y >= 0; y--) {
-	//		if (tilemap[x][y]->overlayTile->GetTileType() != Tile::empty) {
+	//add all trees to renderinglist
+	for (int x = 0; x < (tileWidth); x++) {
+		for (int y = tileHeight - 1; y >= 0; y--) {
+			if (tilemap[x][y]->overlayTile->GetTileType() != Tile::empty) {
 
-	//			for (size_t i = 0; i < tilemap[x][y]->overlayTile->treeHolder.size(); i++)
-	//			{
-	//				Tree* tree = &tilemap[x][y]->overlayTile->treeHolder[i];
-	//				tree->yPos = tree->rect.y;
+				for (size_t i = 0; i < tilemap[x][y]->overlayTile->treeHolder.size(); i++)
+				{
+					Tree* tree = &tilemap[x][y]->overlayTile->treeHolder[i];
+					tree->yPos = tree->rect.y+24; //magic nr offset
 
-	//				renderingList.push_back(tree);
-	//			}
-	//		}
-	//	}
-	//}
-	////add mountain to renderinglist
-	//for (size_t j = 0; j < mountains.size(); j++)
-	//{
-	//	for (size_t i = 0; i < mountains[j].mountainRects.size(); i++)
-	//	{
-	//		mountains[j].yPos = mountains[j].mountainRects[0].y;
-	//		mountains[j].sourceListIndex = j;
-	//		mountains[j].destListIndex = i;
-	//		renderingList.push_back(&mountains[j]);
-	//	}
-	//}
+					renderingList.push_back(tree);
+				}
+			}
+		}
+	}
+	//add mountain to renderinglist
+	for (int j = 0; j < mountains.size(); j++)
+	{
+		for (int i = 0; i < mountains[j].mountainRects.size(); i++)
+		{
+			mountains[j].yPos = mountains[j].mountainRects[0].y + 64; //tilesizeoffset
+			mountains[j].sourceListIndex = j;
+			renderingList.push_back(&mountains[j]);
+		}
+	}
 
-	//std::sort(renderingList.begin(), renderingList.end(), [](const DecorBase* a, const DecorBase* b) {
-	//	return a->yPos > b->yPos;
-	//	});
+	std::sort(renderingList.begin(), renderingList.end(), [](const DecorBase* a, const DecorBase* b) {
+		return a->yPos < b->yPos;
+		});
 }
 void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 	size_t my_size = landTiles.size();

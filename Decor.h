@@ -89,7 +89,7 @@ public:
 		}
 	}
 
-	int sourceListIndex = 0, destListIndex = 0;
+	int sourceListIndex;
 	std::vector<SDL_Rect> mountainSource;
 	std::vector<SDL_Rect> mountainRects;
 
