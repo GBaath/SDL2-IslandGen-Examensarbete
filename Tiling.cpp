@@ -281,10 +281,6 @@ void Tilemap::SpawnMountains(int count) {
 		mountains[i].Init(size, posx,posy);
 		
 	}
-	////sort y layering
-	//std::sort(mountains.begin(), mountains.end(), [](const Mountain& a, const Mountain& b) {
- //       return a.posY < b.posY;
- //   });
 }
 
 
@@ -355,10 +351,4 @@ void Tile::SpawnTrees(int density,DecorType type) {
 
 		Tilemap::GetDecorMapCordsOfTileType(&treeHolder[i].textureMapCordsX, &treeHolder[i].textureMapCordsY, type);
 	}
-
-	////sort the layering
-	//std::sort(treeHolder.begin(), treeHolder.end(), [](const Tree& a, const Tree& b) {
-	//	return a.posY < b.posY;
-	//	});
-
 }
