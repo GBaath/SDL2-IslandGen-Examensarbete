@@ -93,13 +93,61 @@ public:
 			*x = 2;
 			*y = 3;
 			break;
-		case Tile::forest_pine:
+		case Tile::riverDeltaTop:
 			*x = 3;
 			*y = 3;
 			break;
-		case Tile::forest_birch:
+		case Tile::riverDeltaLeft:
 			*x = 4;
 			*y = 3;
+			break;
+		case Tile::riverDeltaBot:
+			*x = 5;
+			*y = 3;
+			break;
+		case Tile::riverDeltaRight:
+			*x = 6;
+			*y = 3;
+			break;
+		case Tile::riverEndTop:
+			*x = 7;
+			*y = 3;
+			break;
+		case Tile::riverEndBot:
+			*x = 8;
+			*y = 3;
+			break;
+		case Tile::riverHorizontal:
+			*x = 6;
+			*y = 0;
+			break;
+		case Tile::riverTopRight:
+			*x = 7;
+			*y = 0;
+			break;
+		case Tile::riverEndLeft:
+			*x = 8;
+			*y = 0;
+			break;
+		case Tile::riverBotLeft:
+			*x = 7;
+			*y = 1;
+			break;
+		case Tile::riverEndRight:
+			*x = 8;
+			*y = 1;
+			break;
+		case Tile::riverVertical:
+			*x = 6;
+			*y = 2;
+			break;
+		case Tile::riverLeftTop:
+			*x = 7;
+			*y = 2;
+			break;
+		case Tile::riverRightBot:
+			*x = 8;
+			*y = 2;
 			break;
 		case Tile::empty:
 			break;

@@ -17,7 +17,12 @@ public:
 		bottomleftLand,bottomLand,bottomrightLand,
 		topWater,bottomWater,
 		rightWater,leftWater,
-		pond, forest_pine, forest_birch
+		pond, 
+		riverDeltaRight, riverDeltaTop, riverDeltaLeft, riverDeltaBot,
+		riverHorizontal, riverVertical,
+		riverTopRight, riverRightBot, riverBotLeft, riverLeftTop,
+		riverEndLeft, riverEndRight, riverEndTop, riverEndBot,
+		forest_pine, forest_birch
 	};
 	enum DecorType {
 		none, pine, birch
