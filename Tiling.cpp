@@ -159,15 +159,18 @@ void Tilemap::MakeIsland() {
 		avaliabeSpawnTiles.clear(); //clean vector for next iteration
 	}
 
+	//more water here
+	BonusWater(4,16,1);
+
 	//ruletiling
-	for (int x = 0; x < (tileWidth); x++) {
+	/*for (int x = 0; x < (tileWidth); x++) {
 		for (int y = 0; y < (tileHeight); y++) {
 			tilemap[x][y]->SetTileTypeFromNeighbors();
 		}
-	}
+	}*/
 		
-	SpawnForests(10, 40);
-	SpawnMountains(4);
+	/*SpawnForests(10, 60);
+	SpawnMountains(4);*/
 
 
 	//add all trees to renderinglist
@@ -199,6 +202,71 @@ void Tilemap::MakeIsland() {
 	std::sort(renderingList.begin(), renderingList.end(), [](const DecorBase* a, const DecorBase* b) {
 		return a->yPos < b->yPos;
 		});
+}
+void Tilemap::BonusWater(int lakeTilesSources, int bonusLakeTiles, int riverCount) {
+	std::vector <Tile*> avaliabeSpawnTiles;
+	std::vector <Tile*> lakeTiles;
+
+	//iterate thru all tiles check for tiles with only land neighbor, make to source
+	while (lakeTilesSources > 0) {
+		for (int x = 3; x < (tileWidth-3); x++) {
+			for (int y = 3; y < tileHeight-3; y++) {
+				Tile* sourcetile = tilemap[x][y];
+				bool compatable = true;
+
+				for (Tile* tile : sourcetile->neighborTiles) {
+					if (tile->GetTileType() != Tile::land_full)
+						continue;
+					for (Tile* ntile : tile->neighborTiles) {
+						//no check for source
+						if (ntile == tile)
+							continue;
+						//all others are land
+						if (ntile->GetTileType() == Tile::water_full)
+							compatable = false;
+					}
+					if (compatable) {
+						avaliabeSpawnTiles.push_back(tile);
+					}
+					compatable = true;
+				}
+			}
+		}
+		int random = Calculator::GetRandomIndex(0, avaliabeSpawnTiles.size()-1);
+
+		avaliabeSpawnTiles[random]->SetTileType(Tile::water_full);
+		lakeTiles.push_back(avaliabeSpawnTiles[random]);
+		lakeTilesSources--;
+		avaliabeSpawnTiles.clear();
+	}
+
+	//SHIT IS BROKEN
+	while (bonusLakeTiles > 0) {
+		//expand random sources until == bonuslaketiles
+		bool compatable = true;
+		for (Tile* tile : lakeTiles) {
+			for (Tile* ntile : tile->neighborTiles) {
+				//no check for source
+				if (ntile == tile)
+					continue;
+				//all others are land
+				if (ntile->GetTileType() == Tile::water_full)
+					compatable = false;
+			}
+			if (compatable) {
+				avaliabeSpawnTiles.push_back(tile);
+			}
+		}
+		int random = Calculator::GetRandomIndex(0, avaliabeSpawnTiles.size()-1);
+
+
+		avaliabeSpawnTiles[random]->SetTileType(Tile::water_full);
+		lakeTiles.push_back(avaliabeSpawnTiles[random]);
+		avaliabeSpawnTiles.clear();
+
+		bonusLakeTiles--;
+	}
+	//spawn river in random lake chose direction, randomwalk
 }
 void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 	size_t my_size = landTiles.size();
@@ -244,7 +312,7 @@ void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 		if (!availableSpawnTilesPine.empty()) {
 			int random = Calculator::GetRandomIndex(0, availableSpawnTilesPine.size() - 1);
 			availableSpawnTilesPine[random]->overlayTile->SetTileType(Tile::forest_pine);
-			availableSpawnTilesPine[random]->overlayTile->SpawnTrees(5,Tile::pine);
+			availableSpawnTilesPine[random]->overlayTile->SpawnTrees(Calculator::GetRandomIndex(3,8), Tile::pine);
 			forestTiles.push_back(availableSpawnTilesPine[random]);
 			currentCount++;
 		}
@@ -256,7 +324,7 @@ void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 		if (!availableSpawnTilesBirch.empty()) {
 			int random = Calculator::GetRandomIndex(0, availableSpawnTilesBirch.size() - 1);
 			availableSpawnTilesBirch[random]->overlayTile->SetTileType(Tile::forest_birch);
-			availableSpawnTilesBirch[random]->overlayTile->SpawnTrees(5,Tile::birch);
+			availableSpawnTilesBirch[random]->overlayTile->SpawnTrees(Calculator::GetRandomIndex(3, 8),Tile::birch);
 			forestTiles.push_back(availableSpawnTilesBirch[random]);
 			currentCount++;
 		}

@@ -17,7 +17,7 @@ public:
 		bottomleftLand,bottomLand,bottomrightLand,
 		topWater,bottomWater,
 		rightWater,leftWater,
-		pond, 
+		pond, riverBase,
 		riverDeltaRight, riverDeltaTop, riverDeltaLeft, riverDeltaBot,
 		riverHorizontal, riverVertical,
 		riverTopRight, riverRightBot, riverBotLeft, riverLeftTop,
