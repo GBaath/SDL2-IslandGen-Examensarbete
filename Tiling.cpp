@@ -58,11 +58,11 @@ void Tilemap::Init(SDL_Renderer* renderer) {
 	for (int x = 1; x < (tileWidth-1); x++) {
 		for (int y = 1; y < (tileHeight-1); y++) {
 			//top
-			tilemap[x][y]->neighborTiles[0] = tilemap[x][y + 1];
+			tilemap[x][y]->neighborTiles[0] = tilemap[x][y - 1];
 			//right
 			tilemap[x][y]->neighborTiles[1] = tilemap[x + 1][y];
 			//bottom
-			tilemap[x][y]->neighborTiles[2] = tilemap[x][y - 1];
+			tilemap[x][y]->neighborTiles[2] = tilemap[x][y + 1];
 			//left
 			tilemap[x][y]->neighborTiles[3] = tilemap[x - 1][y];
 		}
@@ -160,17 +160,17 @@ void Tilemap::MakeIsland() {
 	}
 
 	//more water here
-	BonusWater(4,16,1);
+	BonusWater(2,6,5,2);
 
+		
 	//ruletiling
-	/*for (int x = 0; x < (tileWidth); x++) {
+	for (int x = 0; x < (tileWidth); x++) {
 		for (int y = 0; y < (tileHeight); y++) {
 			tilemap[x][y]->SetTileTypeFromNeighbors();
 		}
-	}*/
-		
-	/*SpawnForests(10, 60);
-	SpawnMountains(4);*/
+	}
+	SpawnForests(10, 60);
+	SpawnMountains(4);
 
 
 	//add all trees to renderinglist
@@ -203,7 +203,7 @@ void Tilemap::MakeIsland() {
 		return a->yPos < b->yPos;
 		});
 }
-void Tilemap::BonusWater(int lakeTilesSources, int bonusLakeTiles, int riverCount) {
+void Tilemap::BonusWater(int lakeTilesSources, int bonusLakeTiles, int riverCount, int riverSources) {
 	std::vector <Tile*> avaliabeSpawnTiles;
 	std::vector <Tile*> lakeTiles;
 
@@ -232,7 +232,7 @@ void Tilemap::BonusWater(int lakeTilesSources, int bonusLakeTiles, int riverCoun
 				}
 			}
 		}
-		int random = Calculator::GetRandomIndex(0, avaliabeSpawnTiles.size()-1);
+		int random = Calculator::GetRandomIndex(0, (avaliabeSpawnTiles.size()-1));
 
 		avaliabeSpawnTiles[random]->SetTileType(Tile::water_full);
 		lakeTiles.push_back(avaliabeSpawnTiles[random]);
@@ -240,33 +240,146 @@ void Tilemap::BonusWater(int lakeTilesSources, int bonusLakeTiles, int riverCoun
 		avaliabeSpawnTiles.clear();
 	}
 
-	//SHIT IS BROKEN
 	while (bonusLakeTiles > 0) {
 		//expand random sources until == bonuslaketiles
+		//iterate through lakesources and check neighboring tiles are land
 		bool compatable = true;
-		for (Tile* tile : lakeTiles) {
+		for (Tile* tile : lakeTiles) {	
+			compatable = true;
+			//ntile next to source
 			for (Tile* ntile : tile->neighborTiles) {
-				//no check for source
-				if (ntile == tile)
-					continue;
-				//all others are land
-				if (ntile->GetTileType() == Tile::water_full)
-					compatable = false;
-			}
-			if (compatable) {
-				avaliabeSpawnTiles.push_back(tile);
+				compatable = true;
+				//iterate neighbors of neighbor
+				for (Tile* nntile : ntile->neighborTiles) {
+					//skip the tile that sent the call
+					if (nntile == ntile)
+						continue;
+					//neighbortile is allready in vector
+					if (std::find(lakeTiles.begin(), lakeTiles.end(), nntile) != lakeTiles.end())
+						continue;
+					//all others are land
+					if (nntile->GetTileType() == Tile::water_full)
+						compatable = false;
+				}
+				if (compatable) {
+					avaliabeSpawnTiles.push_back(ntile);
+				}
 			}
 		}
-		int random = Calculator::GetRandomIndex(0, avaliabeSpawnTiles.size()-1);
+		//select random avaliable add make water
+		if (!avaliabeSpawnTiles.empty()) {
+			int random = Calculator::GetRandomIndex(0, (avaliabeSpawnTiles.size() - 1));
 
+			avaliabeSpawnTiles[random]->SetTileType(Tile::water_full);
+			lakeTiles.push_back(avaliabeSpawnTiles[random]);
+			avaliabeSpawnTiles.clear();
 
-		avaliabeSpawnTiles[random]->SetTileType(Tile::water_full);
-		lakeTiles.push_back(avaliabeSpawnTiles[random]);
-		avaliabeSpawnTiles.clear();
-
-		bonusLakeTiles--;
+			bonusLakeTiles--;
+		}
+		else
+			break;
 	}
-	//spawn river in random lake chose direction, randomwalk
+	
+	std::vector <Tile*> riverTiles;
+	int riverlength = riverCount;
+
+	for (size_t i = 0; i < riverSources; i++)
+	{
+		riverCount = riverlength;
+
+		//spawn river in random lake chose direction, randomwalk
+		Tile* riverStart = lakeTiles[Calculator::GetRandomIndex(0, (lakeTiles.size() - 1))];
+		riverTiles.push_back(riverStart);
+		int randomDir = Calculator::GetRandomIndex(0, 3);
+		int startDir = randomDir;
+
+		Tile* riverdelta = riverStart->GetNearestLandNeighborInDirection(randomDir);
+		Tile::TileType startDelta = Tile::riverDeltaBase;
+		Tile::TileType startRiver = Tile::riverBase;
+		//holders
+		int dirHolder = 0;
+		int* nextDir = &dirHolder;
+		int prevDir = randomDir;
+
+		//set startingSpriteDir
+		switch (randomDir) {
+		case 0:
+			startDelta = Tile::riverDeltaBot;
+			riverdelta->neighborTiles[randomDir]->SetRandomRiverConnection(2, nextDir,0, riverTiles);
+			break;
+		case 1:
+			startDelta = Tile::riverDeltaLeft;
+			riverdelta->neighborTiles[randomDir]->SetRandomRiverConnection(3, nextDir,1, riverTiles);
+			break;
+		case 2:
+			startDelta = Tile::riverDeltaTop;
+			riverdelta->neighborTiles[randomDir]->SetRandomRiverConnection(0, nextDir,2, riverTiles);
+			break;
+		case 3:
+			startDelta = Tile::riverDeltaRight;
+			riverdelta->neighborTiles[randomDir]->SetRandomRiverConnection(1, nextDir,3, riverTiles);
+			break;
+		}
+
+		//start
+		riverdelta->SetTileType(startDelta);
+		riverTiles.push_back(riverdelta);
+		riverTiles.push_back(riverdelta->neighborTiles[randomDir]);
+
+		while (riverCount > 0){
+			Tile* _new = riverTiles[riverTiles.size() - 1]->neighborTiles[*nextDir];
+			if (_new->GetTileType() != Tile::water_full) {
+
+				prevDir = *nextDir;
+				_new->SetRandomRiverConnection((*nextDir+2)%4, nextDir, (startDir+2)%4, riverTiles);
+				riverTiles.push_back(_new);
+			}
+
+
+			riverCount--;
+		}
+		riverTiles[riverTiles.size() - 1]->CloseThisRiverTile(((prevDir + 2) % 4));
+
+	}
+
+		
+
+	//int lastRandomDir = -1; // Initialize to an invalid value
+	//const int maxConsecutiveFailures = 4;
+
+	//int consecutiveFailures = 0;
+
+	//while (riverCount > 0 && consecutiveFailures < maxConsecutiveFailures) {
+	//	int randomDir;
+
+	//	do {
+	//		randomDir = Calculator::GetRandomIndex(0, 3);
+	//	} while (randomDir == lastRandomDir);
+
+	//	Tile* _new = riverTiles[riverTiles.size() - 1]->neighborTiles[randomDir];
+
+	//	if (_new->neighborTiles[randomDir]->GetTileType() == Tile::riverBase || _new->neighborTiles[randomDir]->GetTileType() == Tile::riverDeltaBase)
+	//		continue;
+
+	//	if (_new->GetTileType() == Tile::water_full) {
+	//		riverTiles[riverTiles.size() - 1]->SetTileType(Tile::riverDeltaBase);
+
+	//		//probably some eror here with connection sprites
+	//		break;
+	//	}
+
+	//	_new->SetTileType(Tile::riverBase);
+	//	riverTiles.push_back(_new);
+
+	//	riverCount--;
+	//	consecutiveFailures = 0; // Reset consecutive failures if a valid tile is generated
+	//	lastRandomDir = randomDir; // Store the last random direction
+	//}
+	//for (Tile* tile : riverTiles) 
+	//{
+	//	tile->SetRiverTileFromNeighbors(tile->GetTileType()==Tile::riverDeltaBase);
+	//}
+	
 }
 void Tilemap::SpawnForests(int startCount, int maxTileCount) {
 	size_t my_size = landTiles.size();

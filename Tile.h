@@ -5,6 +5,7 @@
 #include <vector>
 #include "Tilemap.h"
 #include "Decor.h";
+#include "Calculator.h"
 
 
 
@@ -17,8 +18,9 @@ public:
 		bottomleftLand,bottomLand,bottomrightLand,
 		topWater,bottomWater,
 		rightWater,leftWater,
-		pond, riverBase,
+		pond, riverBase, riverDeltaBase,
 		riverDeltaRight, riverDeltaTop, riverDeltaLeft, riverDeltaBot,
+		riverDeltaEdgeRight, riverDeltaEdgeTop, riverDeltaEdgeLeft, riverDeltaEdgeBot,
 		riverHorizontal, riverVertical,
 		riverTopRight, riverRightBot, riverBotLeft, riverLeftTop,
 		riverEndLeft, riverEndRight, riverEndTop, riverEndBot,
@@ -42,14 +44,26 @@ public:
 			return;
 		bool top= false, right= false, bot = false, left = false;
 
-		if (neighborTiles[0] != nullptr) 
-			top = neighborTiles[0]->GetTileType() == land_full;
+		//rivers with landconnection on side
+		if (neighborTiles[0] != nullptr)
+			if (neighborTiles[0]->GetTileType() == land_full || neighborTiles[0]->GetTileType() == riverRightBot || (neighborTiles[0]->GetTileType() == riverHorizontal 
+				|| (neighborTiles[0]->GetTileType() == riverBotLeft || (neighborTiles[0]->GetTileType() == riverDeltaRight || (neighborTiles[0]->GetTileType() == riverDeltaLeft)))))
+					bot = true;
+
 		if (neighborTiles[1] != nullptr)
-			right = neighborTiles[1]->GetTileType() == land_full;
+			if (neighborTiles[1]->GetTileType() == land_full || neighborTiles[1]->GetTileType() == riverVertical || (neighborTiles[1]->GetTileType() == riverBotLeft
+				|| (neighborTiles[1]->GetTileType() == riverLeftTop || (neighborTiles[1]->GetTileType() == riverDeltaTop || (neighborTiles[1]->GetTileType() == riverDeltaBot)))))
+					right = true;
+
 		if (neighborTiles[2] != nullptr)
-			bot = neighborTiles[2]->GetTileType() == land_full;
+			if (neighborTiles[2]->GetTileType() == land_full || neighborTiles[2]->GetTileType() == riverTopRight || (neighborTiles[2]->GetTileType() == riverHorizontal
+				|| (neighborTiles[2]->GetTileType() == riverLeftTop || (neighborTiles[2]->GetTileType() == riverDeltaRight || (neighborTiles[2]->GetTileType() == riverDeltaLeft)))))
+					top = true;
 		if (neighborTiles[3] != nullptr)
-			left = neighborTiles[3]->GetTileType() == land_full;
+			if (neighborTiles[3]->GetTileType() == land_full || neighborTiles[3]->GetTileType() == riverVertical || (neighborTiles[3]->GetTileType() == riverRightBot
+				|| (neighborTiles[3]->GetTileType() == riverTopRight || (neighborTiles[3]->GetTileType() == riverDeltaTop || (neighborTiles[3]->GetTileType() == riverDeltaBot)))))
+				left = true;
+
 
 		
 
@@ -121,7 +135,406 @@ public:
 		return false;
 	}
 	int GetTreeDensity() { return treeDensity; }
+
+	void SetRandomRiverConnection(int dir, int* dirOut,int illegalDir, std::vector <Tile*> riverTiles, bool isDelta = false) {
+		//dir 0 1 2 3 = up, right, down, left
+		if (dir < 0)
+			dir = 0;
+		if (dir > 3)
+			dir = 3;
+
+		std::vector <int> illdirs = {-1,-1,-1,-1, illegalDir};
+
+		//is neighbor a river
+		for (size_t i = 0; i < 4; i++)
+		{ 
+			if (std::find(riverTiles.begin(), riverTiles.end(), neighborTiles[i]) != riverTiles.end()) {
+				illdirs[i] = i;
+			}
+		}
+
+		int r = Calculator::GetRandomIndex(0, 2);
+
+		if (isDelta) {
+			switch (dir)
+			{
+			case 0:
+				SetTileType(riverDeltaBot);
+				break;
+			case 1:
+				SetTileType(riverDeltaLeft);
+				break;
+			case 2:
+				SetTileType(riverDeltaTop);
+				break;
+			case 3:
+				SetTileType(riverDeltaRight);
+				break;
+			default:
+				SetTileType(empty);
+				break;
+			}
+		}
+		
+		//please dont look here
+		//spawndirection data for where to connect next rivertile
+		int consecfails = -1;
+		do {
+			consecfails++;
+			switch (dir)
+			{
+			case 0:
+				switch (r)
+				{
+				case 0:
+					for(int i : illdirs)
+					{
+						*dirOut = 1;
+						if(i==*dirOut)
+							continue;
+						else {
+							SetTileType(riverTopRight);
+							return;
+						}
+					}
+					break;
+				case 1:
+					for(int i : illdirs)
+					{
+						*dirOut = 2;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverVertical);
+							return;
+
+						}
+					}
+					break;
+				case 2:
+					for(int i : illdirs)
+					{
+						*dirOut = 3;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverLeftTop);
+							return;
+
+						}
+					}
+					break;
+				}			
+			case 1:
+				switch (r)
+				{
+				case 0:
+					for(int i : illdirs)
+					{
+						*dirOut = 0;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverTopRight);
+							return;
+
+						}
+					}
+					break;
+				case 1:
+					for(int i : illdirs)
+					{
+						*dirOut = 3;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverHorizontal);
+							return;
+
+						}
+					}
+				case 2:
+					for(int i : illdirs)
+					{
+						*dirOut = 2;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverRightBot);
+							return;
+
+						}
+					}
+
+					break;
+				}				
+			case 2:
+				switch (r)
+				{
+				case 0:
+					for(int i : illdirs)
+					{
+						*dirOut = 0;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverVertical);
+							return;
+
+						}
+					}
+
+					break;
+				case 1:
+					for(int i : illdirs)
+					{
+						*dirOut = 1;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverRightBot);
+							return;
+
+						}
+					}
+
+					break;
+				case 2:
+					for(int i : illdirs)
+					{
+						*dirOut = 3;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverBotLeft);
+							return;
+
+						}
+					}
+					break;
+				}
+			case 3:
+				switch (r)
+				{
+				case 0:
+					for(int i : illdirs)
+					{
+						*dirOut = 0;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverLeftTop);
+							return;
+
+						}
+					}
+					break;
+				case 1:
+					for(int i : illdirs)
+					{
+						*dirOut = 1;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverHorizontal);
+							return;
+
+						}
+					}
+					break;
+				case 2:
+					for(int i : illdirs)
+					{
+						*dirOut = 2;
+						if(i==*dirOut)
+							continue;
+						else{
+							SetTileType(riverBotLeft);
+							return;
+
+						}
+					}
+					break;
+				}
+				
+			}
+		}
+		while (consecfails < 15);
+
+
+		CloseThisRiverTile(dir);
+		return;
+
+		//after consecfails
+		switch (dir) {
+		case 0:
+			SetTileType(riverEndTop);
+			return;
+		case 3:
+			SetTileType(riverEndRight);
+			return;
+		case 2:
+			SetTileType(riverEndBot);
+			return;
+		case 1:
+			SetTileType(riverEndLeft);
+			return;
+		}
+
 	
+	}
+
+	//bugged, spawning on existing river
+	//TODO remake tilemap and spawn edge on top
+	void CloseThisRiverTile(int dir) 
+	{
+		if (dir < 0)
+			dir = 0;
+		if (dir > 3)
+			dir = 3;
+
+		//make inte reiver delta if spawn into water
+		if (neighborTiles[dir]->GetTileType() == water_full) {
+			switch (dir) {
+			case 0:
+				SetTileType(riverDeltaBot);
+				break;
+			case 1:
+				SetTileType(riverDeltaLeft);
+				break;
+			case 2:
+				SetTileType(riverDeltaTop);
+				break;
+			case 3:
+				SetTileType(riverDeltaRight);
+				break;
+
+			default:
+				break;
+			}
+			return;
+		}
+
+		switch (dir) {
+		case 0:
+			SetTileType(riverEndTop);
+			break;
+		case 1:
+			SetTileType(riverEndRight);
+			break;
+		case 2:
+			SetTileType(riverEndBot);
+			break;
+		case 3:
+			SetTileType(riverEndLeft);
+			break;
+
+		default: 
+			break;
+		}
+	}
+	void SetRiverTileFromNeighbors(bool isDelta) {
+
+
+		bool top = false, right = false, bot = false, left = false;
+
+		//rivers with landconnection on side
+		switch (neighborTiles[0]->GetTileType()) {
+		case riverDeltaBase:
+		case riverBase:
+		case riverRightBot:
+		case riverVertical:
+		case riverBotLeft:
+		case riverDeltaTop:
+			top = true;
+			break;
+
+		default:
+			top = false;
+			break;
+		}
+		switch (neighborTiles[1]->GetTileType()) {
+		case riverDeltaBase:
+		case riverBase:
+		case riverHorizontal:
+		case riverBotLeft:
+		case riverLeftTop:
+		case riverDeltaRight:
+			right = true;
+			break;
+
+		default:
+			right = false;
+			break;
+		}
+		switch (neighborTiles[2]->GetTileType()) {
+		case riverDeltaBase:
+		case riverBase:
+		case riverTopRight:
+		case riverVertical:
+		case riverLeftTop:
+		case riverDeltaBot:
+			bot = true;
+			break;
+
+		default:
+			bot = false;
+			break;
+		}
+		switch (neighborTiles[3]->GetTileType()) {
+		case riverDeltaBase:
+		case riverBase:
+		case riverHorizontal:
+		case riverRightBot:
+		case riverTopRight:
+		case riverDeltaLeft:
+			left = true;
+			break;
+
+		default:
+			left = false;
+			break;
+		}
+
+				
+		if (isDelta) {
+			if (top)
+				SetTileType(riverDeltaBot);
+			else if (right)
+				SetTileType(riverDeltaLeft);
+			else if (bot)
+				SetTileType(riverDeltaTop);
+			else if (left)
+				SetTileType(riverDeltaRight);
+				
+			return;
+		}
+		
+		if (top && right)
+			SetTileType(riverTopRight);
+		else if (top && bot)
+			SetTileType(riverVertical);
+		else if (top && left)
+			SetTileType(riverLeftTop);
+		else if (right && bot)
+			SetTileType(riverRightBot);
+		else if (right && left)
+			SetTileType(riverHorizontal);
+		else if (bot && left)
+			SetTileType(riverBotLeft);
+	}
+	Tile* GetNearestLandNeighborInDirection(int dir) {
+		if (dir < 0)
+			dir = 0;
+		if (dir > 3)
+			dir = 3;
+
+		//loop thru neighbors
+		if (neighborTiles[dir]->GetTileType() == land_full)
+			return neighborTiles[dir];
+		else
+			return neighborTiles[dir]->GetNearestLandNeighborInDirection(dir);
+	}
 
 	TileType GetTileType() { return tileType; }
 	DecorType GetDecorType() { return  decorType; } 

@@ -18,7 +18,7 @@ public:
 	void Init(SDL_Renderer* renderer);
 	void RenderTiles(SDL_Renderer* renderer);
 	void MakeIsland();
-	void BonusWater(int lakeSources,int bonusLakeTiles, int riverCount);
+	void BonusWater(int lakeSources,int bonusLakeTiles, int riverCount, int riverSources);
 	void SpawnForests(int startCount, int maxTileCount);
 	void SpawnMountains(int count);
 	void ClearIsland();
