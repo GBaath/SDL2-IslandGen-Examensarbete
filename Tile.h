@@ -384,8 +384,6 @@ public:
 	
 	}
 
-	//bugged, spawning on existing river
-	//TODO remake tilemap and spawn edge on top
 	void CloseThisRiverTile(int dir) 
 	{
 		if (dir < 0)
@@ -523,6 +521,7 @@ public:
 		else if (bot && left)
 			SetTileType(riverBotLeft);
 	}
+
 	Tile* GetNearestLandNeighborInDirection(int dir) {
 		if (dir < 0)
 			dir = 0;
@@ -535,12 +534,13 @@ public:
 		else
 			return neighborTiles[dir]->GetNearestLandNeighborInDirection(dir);
 	}
-
 	TileType GetTileType() { return tileType; }
 	DecorType GetDecorType() { return  decorType; } 
+
 	Tile* neighborTiles[4]{nullptr,nullptr,nullptr,nullptr};
 	Tile* overlayTile = nullptr;
 	Tile* spawnedFrom = nullptr;
+
 	SDL_Rect tileRect;
 	std::vector <Tree> treeHolder;
 private:

@@ -212,8 +212,7 @@ private:
 	std::vector<DecorBase*> renderingList;
 
 	//used for coordinate management of source image
-	const static int SOURCETILESX = 9,
-		SOURCETILESY = 4;
+	const static int SOURCETILESX = 9, SOURCETILESY = 4;
 	const static int DECORSOURCETILESX = 4, DECORSOURCETILESY = 4;
 	const static int MOUNTAINSOURCETILES = 5;
 

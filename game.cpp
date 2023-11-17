@@ -77,9 +77,6 @@ void Game::Update()
 {
 	fdata.frameStart = SDL_GetTicks();
 	fdata.framecnt++;
-	//std::cout << fdata.framecnt << std::endl;
-
-	//stuff
 	
 	fdata.frameTime = SDL_GetTicks() - fdata.frameStart;
 
