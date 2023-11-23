@@ -160,7 +160,7 @@ void Tilemap::MakeIsland() {
 	}
 
 	//more water here
-	BonusWater(2,6,5,2);
+	BonusWater(2,6,5,1);
 
 		
 	//ruletiling
@@ -342,43 +342,6 @@ void Tilemap::BonusWater(int lakeTilesSources, int bonusLakeTiles, int riverCoun
 
 	}
 
-		
-
-	//int lastRandomDir = -1; // Initialize to an invalid value
-	//const int maxConsecutiveFailures = 4;
-
-	//int consecutiveFailures = 0;
-
-	//while (riverCount > 0 && consecutiveFailures < maxConsecutiveFailures) {
-	//	int randomDir;
-
-	//	do {
-	//		randomDir = Calculator::GetRandomIndex(0, 3);
-	//	} while (randomDir == lastRandomDir);
-
-	//	Tile* _new = riverTiles[riverTiles.size() - 1]->neighborTiles[randomDir];
-
-	//	if (_new->neighborTiles[randomDir]->GetTileType() == Tile::riverBase || _new->neighborTiles[randomDir]->GetTileType() == Tile::riverDeltaBase)
-	//		continue;
-
-	//	if (_new->GetTileType() == Tile::water_full) {
-	//		riverTiles[riverTiles.size() - 1]->SetTileType(Tile::riverDeltaBase);
-
-	//		//probably some eror here with connection sprites
-	//		break;
-	//	}
-
-	//	_new->SetTileType(Tile::riverBase);
-	//	riverTiles.push_back(_new);
-
-	//	riverCount--;
-	//	consecutiveFailures = 0; // Reset consecutive failures if a valid tile is generated
-	//	lastRandomDir = randomDir; // Store the last random direction
-	//}
-	//for (Tile* tile : riverTiles) 
-	//{
-	//	tile->SetRiverTileFromNeighbors(tile->GetTileType()==Tile::riverDeltaBase);
-	//}
 	
 }
 void Tilemap::SpawnForests(int startCount, int maxTileCount) {
